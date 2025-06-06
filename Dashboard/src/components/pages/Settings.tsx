@@ -1,116 +1,90 @@
-import React from 'react';
-import { Bell, Lock, Eye, Globe, Moon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Globe, Lock, Eye, BellRing } from 'lucide-react';
 
-const Settings: React.FC = () => {
+export default function Settings() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white mb-6">Settings</h1>
-
-      {/* Account Settings */}
-      <div className="bg-gray-900 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold text-white mb-4">Account Settings</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center">
-              <Lock className="w-5 h-5 text-blue-400 mr-3" />
-              <div>
-                <p className="text-white font-medium">Password</p>
-                <p className="text-sm text-gray-400">Change your password</p>
-              </div>
-            </div>
-            <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-900 transition-colors">
-              Update
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center">
-              <Bell className="w-5 h-5 text-blue-400 mr-3" />
-              <div>
-                <p className="text-white font-medium">Notifications</p>
-                <p className="text-sm text-gray-400">Manage notification preferences</p>
-              </div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
+    <div className="space-y-6 p-2">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground">
+          Manage your application preferences and settings
+        </p>
       </div>
 
-      {/* Preferences */}
-      <div className="bg-gray-900 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold text-white mb-4">Preferences</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center">
-              <Moon className="w-5 h-5 text-blue-400 mr-3" />
-              <div>
-                <p className="text-white font-medium">Dark Mode</p>
-                <p className="text-sm text-gray-400">Toggle dark/light theme</p>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>General Settings</CardTitle>
+            <CardDescription>Configure your general application preferences</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Globe className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="language">Language</Label>
+                  <p className="text-sm text-muted-foreground">Select your preferred language</p>
+                </div>
               </div>
+              <Select defaultValue="en">
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Spanish</SelectItem>
+                  <SelectItem value="fr">French</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center">
-              <Globe className="w-5 h-5 text-blue-400 mr-3" />
-              <div>
-                <p className="text-white font-medium">Language</p>
-                <p className="text-sm text-gray-400">Select your preferred language</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Eye className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <Label>Compact View</Label>
+                  <p className="text-sm text-muted-foreground">Use compact view for dense information display</p>
+                </div>
               </div>
+              <Switch />
             </div>
-            <select className="bg-gray-900 text-white rounded-lg p-2 border border-gray-600">
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-            </select>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center">
-              <Eye className="w-5 h-5 text-blue-400 mr-3" />
-              <div>
-                <p className="text-white font-medium">Display Density</p>
-                <p className="text-sm text-gray-400">Adjust the display density</p>
+        <Card>
+          <CardHeader>
+            <CardTitle>Privacy Settings</CardTitle>
+            <CardDescription>Control your privacy preferences</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <Label>Two-Factor Authentication</Label>
+                  <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                </div>
               </div>
+              <Button variant="outline">Configure</Button>
             </div>
-            <select className="bg-gray-900 text-white rounded-lg p-2 border border-gray-600">
-              <option value="comfortable">Comfortable</option>
-              <option value="compact">Compact</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
-      {/* Data & Privacy */}
-      <div className="bg-gray-900 p-6 rounded-lg">
-        <h2 className="text-xl font-semibold text-white mb-4">Data & Privacy</h2>
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <p className="text-white font-medium mb-2">Data Export</p>
-            <p className="text-sm text-gray-400 mb-4">Download a copy of your data</p>
-            <button className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-900 transition-colors">
-              Export Data
-            </button>
-          </div>
-
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <p className="text-white font-medium mb-2">Account Deletion</p>
-            <p className="text-sm text-gray-400 mb-4">Permanently delete your account and all data</p>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-800 transition-colors">
-              Delete Account
-            </button>
-          </div>
-        </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <BellRing className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <Label>Activity Log</Label>
+                  <p className="text-sm text-muted-foreground">Track all account activities</p>
+                </div>
+              </div>
+              <Button variant="outline">View Log</Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default Settings;
+}

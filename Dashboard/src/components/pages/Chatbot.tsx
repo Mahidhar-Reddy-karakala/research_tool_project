@@ -76,6 +76,7 @@ const Chatbot: React.FC = () => {
   };
 
   return (
+    
     <div className="flex flex-col h-[calc(100vh-12rem)]">
       <h1 className="text-2xl font-bold text-white mb-6">AI Trading Assistant</h1>
 

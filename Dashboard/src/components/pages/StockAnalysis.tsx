@@ -90,3 +90,4 @@ const StockAnalysis: React.FC = () => {
 };
 
 export default StockAnalysis;
+
