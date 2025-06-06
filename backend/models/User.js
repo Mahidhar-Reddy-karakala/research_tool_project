@@ -197,7 +197,7 @@ const deleteTimelineEntry = async (userId, entryId) => {
   }
 };
 
-
+// const financialData = async
 
 
 module.exports = { User, addTimelineEntry, getTimeLineEntries, updateTimelineEntry, deleteTimelineEntry };

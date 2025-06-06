@@ -5,6 +5,11 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const timeLineRoutes = require('./routes/timeLine');
+const financeRoutes = require('./routes/financial');
+const portfolioRoutes = require('./routes/portfolio')
+
+
+
 dotenv.config();
 
 const app = express();
@@ -27,8 +32,8 @@ app.use(cors({
 // ---------------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/timeline',timeLineRoutes);
-
-
+app.use('/api/finance',financeRoutes);
+app.use('/api/portfolio',portfolioRoutes);
 // ---------------------------
 // MongoDB Connection
 // ---------------------------
