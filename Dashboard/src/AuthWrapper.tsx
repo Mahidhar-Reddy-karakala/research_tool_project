@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { verify } from '../../src/services/authServices';
+
+import axios from 'axios';
+axios.defaults.withCredentials = true;
+const API_URL = 'http://localhost:5000/api/auth';
+
+const verify = async () => {
+  const response = await axios.get(`${API_URL}/verify`, {
+    withCredentials: true
+  });
+  return response.data;
+};
 
 // Config for different server addresses
 const config = {

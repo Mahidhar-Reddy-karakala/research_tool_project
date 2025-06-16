@@ -5,6 +5,7 @@ const router = express.Router();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const documents = mongoose.connection.collection('documents');
+const daily_prices= mongoose.connection.collection('daily_prices');
 // Then use: await documents.findOne({ _id: new ObjectId(id) });
 dotenv.config();
 
@@ -62,5 +63,33 @@ router.get("/financial-data/:id", authenticateUser, async (req, res) => {
         });
     }
 });
+
+function getCurrentDateString(){
+    // Format to match "2025-06-14"
+    return new Date().toISOString().split('T')[0];
+}
+
+router.get('/stocks/:id', async (req, res) => {
+  const { id } = req.params;
+  const today = getCurrentDateString();
+
+  try {
+    // Query by id and fetched_at_date matching today
+    const stock = await daily_prices.findOne({ 
+      id: id, 
+      fetched_at_date: today 
+    });
+
+    if (stock) {
+      res.json(stock);
+    } else {
+      res.status(404).json({ message: "Stock not found for today" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 
 module.exports = router;

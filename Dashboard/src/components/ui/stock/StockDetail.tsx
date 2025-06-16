@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { stocks, generateChartData } from '@/lib/mockData';
+import { stocks, generateChartData} from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {BarChart1 } from '@/components/ui/charts/barchart';
 import {PieChart1} from '@/components/ui/charts/pie';
+import {} from '../charts/Linechart';
 import {BarChartMultiple} from '@/components/ui/charts/barchart2'
 import { 
   Tabs, 
@@ -12,8 +13,8 @@ import {
   TabsTrigger 
 } from '@/components/ui/tabs';
 import { formatCurrency, formatPercentage, formatNumber } from '@/lib/utils';
-import { Area, AreaChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowLeft, Star, StarOff, TrendingUp, TrendingDown } from 'lucide-react';
+import { Area, AreaChart, XAxis, YAxis, Tooltip, ResponsiveContainer, Line } from 'recharts';
+import { ArrowLeft, Star, StarOff, TrendingUp, TrendingDown, LineChart } from 'lucide-react';
 import axios from 'axios';
 import Markdown from 'react-markdown';
 
@@ -30,17 +31,34 @@ export interface SummaryItem {
   filename: string;
 }
 
+export interface StockData {
+  _id: string;
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap: number | null;
+  fetched_at: string;  // ISO date string
+  name: string;
+  fetched_at_date: string;  // YYYY-MM-DD
+  id: string;
+}
+
 
 export default function StockDetail({ stockId, chartData, onClose }: StockDetailProps) {
   const stock = stocks.find(s => s.id === stockId);
+  const Data=stock?.sales;
+  const about_id=stock?.about_id;
   const [timeRange, setTimeRange] = useState<'1w' | '2w' | '1m' | '3m' | '1y'>('1m');
   const [isFavorite, setIsFavorite] = useState(stock?.favorite || false);
   const [isWishlist, setIsWishlist] = useState(stock?.wishlist || false);
   const [view, setView] = useState<'preview' | 'financials' | 'about'>('preview');
-  const [document, setDocument] = useState<StockDocument | null>(null);
+  const [document, setDocument] = useState<StockDocument>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [Price, setPrice] = useState<StockData | null>(null);
+
   if (!stock) return null;
   
   const isPositive = stock.changePercent >= 0;
@@ -52,7 +70,7 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
       
       try {
         const response = await axios.get(
-          'http://localhost:5000/api/finance/financial-data/6836c54c9ec843ba3b283e90',
+          `http://localhost:5000/api/finance/financial-data/${about_id}`,
           {
             withCredentials: true // Important for sending cookies with the request
           }
@@ -84,6 +102,23 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
     fetchFinancialData();
   }, []);
 
+  useEffect(() => {
+    async function fetchStock() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get<StockData>(`http://localhost:5000/api/finance/stocks/${stockId}`);
+        setPrice(response.data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch stock data');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStock();
+  }, []);
   // Generate chart data based on time range
   const getTimeRangeData = () => {
     const days = 
@@ -190,15 +225,15 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
         </div>
         
         <div className="flex items-baseline space-x-2">
-          <span className="text-3xl font-bold">{formatCurrency(stock.price)}</span>
+          <span className="text-3xl font-bold">{formatCurrency(Price?.price ?? 0)}</span>
           <span className={`flex items-center ${isPositive ? "text-green-500" : "text-red-500"}`}>
             {isPositive ? (
               <TrendingUp className="mr-1 h-4 w-4" />
             ) : (
               <TrendingDown className="mr-1 h-4 w-4" />
             )}
-            <span>{formatCurrency(stock.change)}</span>
-            <span className="ml-1">({formatPercentage(stock.changePercent)})</span>
+            <span>{formatCurrency(Price?.change ?? 0)}</span>
+            <span className="ml-1">({formatPercentage(Price?.changePercent ?? 0)})</span>
           </span>
         </div>
       </div>
@@ -490,14 +525,11 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
             )} */}
 
             <div className='flex left-0'>
-              <BarChart1></BarChart1>
+              <BarChart1 chartData={Data}></BarChart1>
               <div className='ml-4'>
-              <PieChart1 ></PieChart1>
-              </div>
-              <div className='ml-4'>
-                <BarChartMultiple></BarChartMultiple>
               </div>
             </div>
+            
             
           </CardContent>
         </Card>
@@ -506,7 +538,7 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
       {view === 'about' && (
         <Card>
           <CardHeader>
-            <CardTitle>Financial Summaries</CardTitle>
+            <CardTitle>About Company</CardTitle>
           </CardHeader>
           
           <CardContent>
@@ -517,7 +549,7 @@ export default function StockDetail({ stockId, chartData, onClose }: StockDetail
                 document.map((item, index) => (
                   <div key={index} className="mb-6">
                     <p className="text-sm text-muted-foreground mb-1">
-                      <strong>Filename:</strong> {item.filename}
+                      Annual Report -FY-24
                     </p>
                     <p className="text-base"><Markdown>{item.sum}</Markdown></p>
                   </div>

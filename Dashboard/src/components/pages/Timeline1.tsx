@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Markdown from "react-markdown"
 
 interface TimelineEntry {
   id: string
@@ -80,7 +81,16 @@ export default function Timeline() {
     try {
       setIsLoading(true)
       const response = await axios.get(`http://localhost:5000/api/timeline/stock/${stockId}`)
-      setEntries(Array.isArray(response.data) ? response.data : [])
+      const entriesWithId: TimelineEntry[] = (response.data as any[]).map(entry => ({
+        id: entry._id,              // map _id to id
+        stockId: entry.stockId,
+        note: entry.note,
+        date: entry.date,
+        type: entry.type,
+        createdAt: entry.createdAt,
+      }));
+  
+      setEntries(entriesWithId);
     } catch (error) {
       toast({
         title: "Error",
@@ -397,7 +407,8 @@ export default function Timeline() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p>{entry.note}</p>
+                    <p className="whitespace-pre-wrap"><Markdown>{entry.note}</Markdown></p>
+                    
                     {showDeleteConfirm === entry.id && (
                       <div className="mt-4 flex items-center justify-end space-x-2">
                         <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(null)}>

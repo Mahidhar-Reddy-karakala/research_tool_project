@@ -206,6 +206,7 @@ const router = express.Router();
 router.get('/stock/:stockId', async (req, res) => {
   try {
     const entries = await Timeline.find({ stockId: req.params.stockId })
+      .select("_id stockId date type note createdAt")
       .sort({ date: -1 });
     res.json(entries);
   } catch (error) {
@@ -258,6 +259,7 @@ router.put('/:id', async (req, res) => {
 // Delete timeline entry
 router.delete('/:id', async (req, res) => {
   try {
+    console.log(req.params.id);
     const timelineEntry = await Timeline.findByIdAndDelete(req.params.id);
     if (!timelineEntry) {
       return res.status(404).json({ error: 'Timeline entry not found' });
