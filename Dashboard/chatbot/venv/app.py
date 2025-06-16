@@ -218,6 +218,7 @@ import os
 import requests
 from datetime import datetime
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 load_dotenv()
 
@@ -400,6 +401,80 @@ Keep the analysis concise, actionable, and format your response in Markdown."""
             "success": False,
             "message": "Unexpected server error"
         }), 500
+
+
+
+
+
+# Your Alpha Vantage API key (use env variable or hardcode for testing)
+ALPHA_VANTAGE_API_KEY = os.getenv("AlphaVantage_API_KEY", "29X9YHVU0IAY0KCT")
+
+# MongoDB setup
+client = MongoClient("mongodb://localhost:27017/")
+db = client['stock-ai']
+collection = db['daily_prices']
+
+# Stock symbols
+symbols = {
+    "HDFC Bank": "HDFCBANK.BSE",
+    "ICICI Bank": "ICICIBANK.BSE",
+    "TCS": "TCS.BSE",
+    "Reliance": "RELIANCE.BSE",
+    "Wipro": "WIPRO.BSE",
+    "Sun Pharma": "SUNPHARMA.BSE",
+    "Kotak Bank": "KOTAKBANK.BSE",
+    "Infosys": "INFY.BSE",
+    "Bharti Airtel": "BHARTIARTL.BSE",
+    "Tata Motors": "TATAMOTORS.BSE"
+}
+
+def fetch_stock_data(symbol_code):
+    url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol_code}&apikey={ALPHA_VANTAGE_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+    quote = data.get("Global Quote", {})
+
+    if not quote:
+        return None
+
+    try:
+        return {
+            "symbol": symbol_code,
+            "price": float(quote.get("05. price", 0)),
+            "change": float(quote.get("09. change", 0)),
+            "changePercent": float(quote.get("10. change percent", "0%").strip('%')),
+            "volume": float(quote.get("06. volume", 0)) / 1e6,  # Convert to millions
+            "marketCap": None,  # Alpha Vantage GLOBAL_QUOTE doesn't provide market cap
+            "fetched_at": datetime.utcnow()
+        }
+    except (ValueError, TypeError):
+        return None
+
+@app.route('/fetch-daily-stock-data', methods=['GET'])
+def fetch_and_store():
+    today = datetime.utcnow().date()
+    existing = collection.find_one({"fetched_at_date": str(today)})
+    if existing:
+        return jsonify({"status": "already_fetched", "message": "Data already fetched for today."})
+
+    results = []
+    for name, code in symbols.items():
+        stock_data = fetch_stock_data(code)
+        if stock_data:
+            stock_data["name"] = name
+            stock_data["fetched_at_date"] = str(today)
+            collection.insert_one(stock_data)
+            results.append(stock_data)
+
+    # Convert ObjectId to str
+    for item in results:
+        item["_id"] = str(item["_id"])
+
+    return jsonify({"status": "success", "fetched_count": len(results), "data": results})
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

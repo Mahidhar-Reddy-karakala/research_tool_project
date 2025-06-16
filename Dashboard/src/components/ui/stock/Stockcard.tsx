@@ -5,6 +5,8 @@ import { type StockData } from '@/lib/mockData';
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
 import { Star, StarOff } from 'lucide-react';
 
+
+
 interface StockCardProps {
   stock: StockData;
   chartData: Array<{ date: string; value: string }>;
