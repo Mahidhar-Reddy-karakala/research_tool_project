@@ -44,3 +44,10 @@ A full-stack stock analysis platform designed to provide users with real-time st
 
 
 
+## 📷 Screenshots
+
+### 📊 Dashboard Overview
+![Dashboard](/Screenshot 2025-05-23 131549.png)
+
+
+
